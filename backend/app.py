@@ -1,18 +1,22 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS  # <-- import CORS here
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import joblib
 import numpy as np
+import os
 
-# Create Flask app
 app = Flask(__name__)
-CORS(app)  # <-- enable CORS for all routes
+CORS(app)
 
-# Load model, scaler, and label encoder
+# Load model, scaler, encoder
 model = joblib.load("dropout_model.pkl")
 scaler = joblib.load("scaler.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# Prediction route
+# Serve frontend
+@app.route("/")
+def serve_frontend():
+    return send_from_directory("../frontend", "index.html")
+
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
@@ -28,4 +32,5 @@ def predict():
     return jsonify({"prediction": y_pred_label})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Use debug=False for stability
+    app.run(debug=False)

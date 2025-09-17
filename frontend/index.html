@@ -46,6 +46,8 @@
         const predictionText = document.getElementById('prediction');
         const adviceText = document.getElementById('advice');
 
+        let myChart = null; // store Chart instance
+
         predictBtn.addEventListener('click', async () => {
             const admission = parseFloat(document.getElementById('admission').value);
             const semester = parseFloat(document.getElementById('semester').value);
@@ -65,7 +67,7 @@
             adviceText.innerText = adviceMsg;
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/predict", {
+                const response = await fetch("/predict", {  // relative URL
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ admission_grade: admission, semester_grade: semester, attendance })
@@ -78,7 +80,9 @@
 
                 // Draw bar chart
                 const ctx = document.getElementById('barChart').getContext('2d');
-                new Chart(ctx, {
+
+                if(myChart) myChart.destroy(); // destroy old chart
+                myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['Admission', 'Semester Grade', 'Attendance'],
