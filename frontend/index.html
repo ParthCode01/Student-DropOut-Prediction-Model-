@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dropout Predictor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container { max-width: 500px; margin: auto; font-family: Arial, sans-serif; }
+        .input-card, .result-card { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        label { display: block; margin: 10px 0 5px; }
+        input { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; border: none; border-radius: 4px; background-color: #2196F3; color: white; cursor: pointer; }
+        button:hover { background-color: #1976D2; }
+        .warning { color: red; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Dropout Predictor</h1>
+        <p>Enter values within realistic ranges:</p>
+
+        <div class="input-card">
+            <label>Admission Grade (50 – 150):</label>
+            <input type="number" id="admission" min="50" max="150" value="100">
+
+            <label>1st Semester Grade (0 – 100):</label>
+            <input type="number" id="semester" min="0" max="100" value="50">
+
+            <label>Attendance (0 – 100):</label>
+            <input type="number" id="attendance" min="0" max="100" value="20">
+
+            <button id="predictBtn">Predict</button>
+            <p id="advice" class="warning"></p>
+        </div>
+
+        <div class="result-card">
+            <h2>Prediction: <span id="prediction">---</span></h2>
+        </div>
+
+        <canvas id="barChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        const predictBtn = document.getElementById('predictBtn');
+        const predictionText = document.getElementById('prediction');
+        const adviceText = document.getElementById('advice');
+
+        predictBtn.addEventListener('click', async () => {
+            const admission = parseFloat(document.getElementById('admission').value);
+            const semester = parseFloat(document.getElementById('semester').value);
+            const attendance = parseFloat(document.getElementById('attendance').value);
+
+            // Input validation
+            if(admission < 50 || admission > 150 || semester < 0 || semester > 100 || attendance < 0 || attendance > 100){
+                alert("Please enter values within realistic ranges!");
+                return;
+            }
+
+            // Advice logic
+            let adviceMsg = "";
+            if(attendance < 50) adviceMsg += "Low attendance! Risk of dropout.\n";
+            if(semester < 40) adviceMsg += "Low semester grade! Academic performance at risk.\n";
+            if(admission < 80) adviceMsg += "Low admission grade! Monitor academic progress.\n";
+            adviceText.innerText = adviceMsg;
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ admission_grade: admission, semester_grade: semester, attendance })
+                });
+                const data = await response.json();
+                predictionText.innerText = data.prediction;
+
+                // Change color based on prediction
+                predictionText.style.color = (data.prediction === "Dropout") ? "red" : "green";
+
+                // Draw bar chart
+                const ctx = document.getElementById('barChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Admission', 'Semester Grade', 'Attendance'],
+                        datasets: [{
+                            label: 'Your Inputs',
+                            data: [admission, semester, attendance],
+                            backgroundColor: ['#4CAF50','#2196F3','#FF9800']
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+
+            } catch(err) {
+                predictionText.innerText = "Error connecting to backend!";
+                predictionText.style.color = "gray";
+            }
+        });
+    </script>
+</body>
+</html>

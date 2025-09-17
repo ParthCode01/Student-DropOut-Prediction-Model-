@@ -1,0 +1,24 @@
+# Student Dropout Prediction Project
+
+## Overview
+This project predicts the likelihood of a student dropping out using academic performance and attendance data. It helps educational institutions identify at-risk students and provide timely support to improve retention and academic success.
+
+## Key Features
+- **Admission Grades:** Initial academic performance upon entry.  
+- **Semester Grades:** Performance trends across semesters.  
+- **Attendance Percentage:** Class participation and engagement.  
+- **Optional Features:** Extra-curricular involvement, disciplinary records, or assignment submission rates (if available).
+
+## Machine Learning Models
+- **Logistic Regression:** Baseline probability estimation.  
+- **Random Forest Classifier:** Handles complex feature interactions and improves prediction accuracy.
+
+## Workflow Steps
+1. **Data Collection:** Gather historical student records labeled as “Dropout” or “Graduate.”  
+2. **Data Preprocessing:** Handle missing values, encode categorical features, normalize numerical data, and scale features.  
+3. **Feature Selection:** Analyze correlations and feature importance to identify the most influential factors.  
+4. **Model Training:** Train selected models and optimize hyperparameters for accuracy.  
+5. **Model Evaluation:** Evaluate using accuracy, precision, recall, F1-score, and cross-validation.  
+6. **Prediction & Intervention:** Identify at-risk students and enable targeted interventions like counseling, academic support, or attendance monitoring.
+
+## Project Structure
